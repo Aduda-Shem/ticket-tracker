@@ -40,17 +40,6 @@ class Ticket(models.Model):
             # Covers the list endpoint: filter by status, newest first.
             models.Index(fields=["status", "-created_at"]),
         ]
-        constraints = [
-            # Enforce the enums in the database too, not just in Python.
-            models.CheckConstraint(
-                condition=models.Q(status__in=["open", "in_progress", "closed"]),
-                name="ticket_status_valid",
-            ),
-            models.CheckConstraint(
-                condition=models.Q(priority__in=["low", "medium", "high"]),
-                name="ticket_priority_valid",
-            ),
-        ]
 
     def __str__(self):
         return self.title

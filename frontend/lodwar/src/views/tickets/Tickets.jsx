@@ -28,7 +28,7 @@ const Tickets = () => {
     return (
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
             <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Support tickets</h1>
-            <p className="mt-1 mb-6 text-sm text-slate-500">Lodwar Services · Mini Ticket Tracker</p>
+            <p className="mt-1 mb-6 text-sm text-slate-500">Ticket Tracker</p>
 
             <TicketStats
                 active={status}
