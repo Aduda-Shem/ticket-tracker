@@ -1,0 +1,37 @@
+services:
+  db:
+    container_name: "lodwar_database"
+    image: postgres:17
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=lodwar_tickets
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5445:5432"
+    volumes:
+      - lodwar_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d lodwar_tickets"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+  backend:
+    container_name: "lodwar_backend"
+    build: .
+    ports:
+      - "8888:8888"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DEBUG=On
+      - SECRET_KEY=dev-only-secret
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=lodwar_tickets
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+
+volumes:
+  lodwar_data:
