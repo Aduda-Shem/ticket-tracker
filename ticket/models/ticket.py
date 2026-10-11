@@ -28,9 +28,7 @@ class Ticket(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, default="")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=OPEN)
-    priority = models.CharField(
-        max_length=20, choices=PRIORITY_CHOICES, default=MEDIUM
-    )
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default=MEDIUM)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

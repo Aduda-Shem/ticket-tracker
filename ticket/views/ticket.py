@@ -120,9 +120,7 @@ class TicketStatsAPIView(APIView):
     @swagger_auto_schema(responses={200: TicketStatsSerializerResponse()})
     def get(self, request):
         counts = dict(
-            Ticket.objects.order_by()
-            .values_list("status")
-            .annotate(count=Count("id"))
+            Ticket.objects.order_by().values_list("status").annotate(count=Count("id"))
         )
         # Always return every status so clients don't have to handle gaps.
         stats = {value: counts.get(value, 0) for value, _ in Ticket.STATUS_CHOICES}
