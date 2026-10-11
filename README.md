@@ -70,17 +70,6 @@ The tests create and destroy a throwaway `test_<db>` database, so your Postgres 
 
 ---
 
-## API
-
-All endpoints are under `/api/v1`. The trailing slash is optional: `/tickets` and `/tickets/` both work.
-Every response has a `message` field. Validation errors return `400` with `{"message": "...", "errors": {field: [...]}}`.
-
-| Method  | Path                 | Description |
-| ------- | -------------------- | ----------- |
-| `POST`  | `/tickets`           | Create a ticket. Requires `title`. Optional: `description`, `priority` (default `medium`), `status` (default `open`). |
-| `GET`   | `/tickets`           | List tickets, newest first. Query params: `status`, `page` (default 1), `limit` (default 20, max 100). |
-| `PATCH` | `/tickets/:id`       | Update `status` and/or `priority`. Any other field returns `400`. An unknown or malformed id returns `404`. |
-| `GET`   | `/tickets/stats`     | Ticket counts per status, plus `total`. Every status is always present, including ones with a count of 0. |
 
 ```sh
 curl -X POST localhost:8888/api/v1/tickets -H 'Content-Type: application/json' \
@@ -113,8 +102,3 @@ frontend/             Django app that serves the SPA shell (templates/index.html
     src/views/        Ticket page and its components
 ```
 
----
-
-## Decisions & Tradeoffs
-
-I followed the structure I use in production Django + React projects (apps split into `models/`, `serializers/` and `views/`, Redux actions and reducers on the frontend). That is more structure than five endpoints strictly need, but it shows how the code would grow. Status and priority are validated against the model choices in the serializer. `PATCH` returns `400` for any field other than status/priority instead of silently ignoring it, and invalid `status`/`page`/`limit` params return `400` instead of an empty list. Pagination is a simple offset/limit with a stable sort (`-created_at, -id`); at real scale I'd move to cursor pagination and drop the `COUNT(*)`. Stats are a single `GROUP BY`, and statuses with no tickets are filled in with 0 so clients never handle missing keys. In the UI, the stat tiles double as the status filter. After a create or update the UI refetches the list instead of patching local state, because a status change can move a ticket out of the current filter or page; that costs one extra request but keeps the screen correct. The main shortcuts: there is no authentication (it's one shared, open board), no delete or title/description editing, no frontend tests, and the app runs on Django's dev server even in Docker. With more time I'd add token auth with requester/assignee ownership, a `gunicorn` + `whitenoise` production image with CI, React Testing Library tests with optimistic updates, and an audit trail of status changes.
