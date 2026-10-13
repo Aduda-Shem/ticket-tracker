@@ -39,7 +39,9 @@ const ticketReducer = (state = initialState, action) => {
       return {
         ...state,
         list: state.list.map((ticket) =>
-          ticket.id === action.payload.ticket.id ? action.payload.ticket : ticket
+          ticket.id === action.payload.ticket.id
+            ? action.payload.ticket
+            : ticket,
         ),
       };
 

@@ -17,17 +17,17 @@ request.interceptors.response.use(
     } else if (response.status >= 500) {
       openNotification(
         "danger",
-        "Oops! Something went wrong on the server. Please try again later."
+        "Oops! Something went wrong on the server. Please try again later.",
       );
     } else {
       openNotification(
         "warning",
-        response.data?.message || "The request could not be completed."
+        response.data?.message || "The request could not be completed.",
       );
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default request;

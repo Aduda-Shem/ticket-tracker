@@ -38,7 +38,8 @@ class TicketAPIView(APIView):
 
         total = tickets.count()
         offset = (page - 1) * limit
-        serializer = TicketSerializer(tickets[offset : offset + limit], many=True)
+        serializer = TicketSerializer(
+            tickets[offset: offset + limit], many=True)
 
         return Response(
             {
@@ -95,7 +96,8 @@ class TicketDetailAPIView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        serializer = TicketUpdateSerializer(ticket, data=request.data, partial=True)
+        serializer = TicketUpdateSerializer(
+            ticket, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -111,10 +113,7 @@ class TicketDetailAPIView(APIView):
         """
             Return the ticket
         """
-        try:
-            return Ticket.objects.get(id=uuid.UUID(str(ticket_id)))
-        except (ValueError, Ticket.DoesNotExist):
-            return None
+        return Ticket.objects.get(id=uuid.UUID(str(ticket_id)))
 
 
 class TicketStatsAPIView(APIView):
@@ -125,7 +124,8 @@ class TicketStatsAPIView(APIView):
             Ticket.objects.order_by().values_list("status").annotate(count=Count("id"))
         )
         # Always return every status so clients don't have to handle gaps.
-        stats = {value: counts.get(value, 0) for value, _ in Ticket.STATUS_CHOICES}
+        stats = {value: counts.get(value, 0)
+                 for value, _ in Ticket.STATUS_CHOICES}
         stats["total"] = sum(stats.values())
 
         return Response(

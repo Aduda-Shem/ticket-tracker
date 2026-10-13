@@ -5,7 +5,8 @@ from ticket.models import Ticket
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(required=True, allow_blank=False, max_length=255)
+    title = serializers.CharField(
+        required=True, allow_blank=False, max_length=255)
 
     class Meta:
         model = Ticket
@@ -28,8 +29,9 @@ class TicketSerializer(serializers.ModelSerializer):
 
 
 class TicketUpdateSerializer(serializers.ModelSerializer):
-    """PATCH is limited to status and priority; anything else is rejected."""
-
+    """
+        PATCH is limited to status and priority.
+    """
     class Meta:
         model = Ticket
         fields = ["status", "priority"]
@@ -56,7 +58,8 @@ class TicketUpdateSerializer(serializers.ModelSerializer):
 
 
 class TicketListQuerySerializer(serializers.Serializer):
-    status = serializers.ChoiceField(choices=Ticket.STATUS_CHOICES, required=False)
+    status = serializers.ChoiceField(
+        choices=Ticket.STATUS_CHOICES, required=False)
     page = serializers.IntegerField(min_value=1, default=DEFAULT_PAGE)
     limit = serializers.IntegerField(
         min_value=1, max_value=MAX_LIMIT, default=DEFAULT_LIMIT
