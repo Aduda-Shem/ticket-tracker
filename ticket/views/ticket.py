@@ -108,7 +108,9 @@ class TicketDetailAPIView(APIView):
         )
 
     def _get_ticket(self, ticket_id):
-        """Return the ticket, or None for a malformed or unknown id."""
+        """
+            Return the ticket
+        """
         try:
             return Ticket.objects.get(id=uuid.UUID(str(ticket_id)))
         except (ValueError, Ticket.DoesNotExist):

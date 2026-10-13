@@ -47,6 +47,13 @@ class TicketUpdateSerializer(serializers.ModelSerializer):
             )
         return attrs
 
+    def update(self, instance, validated_data):
+        """Write only the changed columns instead of the whole row."""
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save(update_fields=[*validated_data, "updated_at"])
+        return instance
+
 
 class TicketListQuerySerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=Ticket.STATUS_CHOICES, required=False)

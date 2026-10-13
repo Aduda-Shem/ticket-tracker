@@ -166,3 +166,30 @@ class TicketStatsAPITest(APITestCase):
         stats = self.client.get(self.url).data["stats"]
         self.assertEqual(stats["open"], 0)
         self.assertEqual(stats["closed"], 1)
+
+
+class TicketQueryCountTest(APITestCase):
+    """Query counts must stay flat as data grows (guards against N+1)."""
+
+    def setUp(self):
+        self.client = APIClient()
+        Ticket.objects.bulk_create([Ticket(title=f"t{i}") for i in range(25)])
+        self.ticket = Ticket.objects.first()
+
+    def test_list_runs_two_queries_regardless_of_page_size(self):
+        for limit in (1, 25):
+            with self.assertNumQueries(2):  # COUNT + one page SELECT
+                self.client.get("/api/v1/tickets", {"limit": limit})
+
+    def test_stats_runs_one_query(self):
+        with self.assertNumQueries(1):
+            self.client.get("/api/v1/tickets/stats")
+
+    def test_patch_updates_only_changed_columns(self):
+        with self.assertNumQueries(2) as ctx:  # SELECT + UPDATE
+            self.client.patch(
+                f"/api/v1/tickets/{self.ticket.id}", {"status": "closed"}, format="json"
+            )
+        update_sql = ctx.captured_queries[-1]["sql"]
+        self.assertIn('"status"', update_sql)
+        self.assertNotIn('"title"', update_sql)

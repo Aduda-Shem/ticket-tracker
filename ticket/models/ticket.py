@@ -34,12 +34,7 @@ class Ticket(models.Model):
 
     class Meta:
         db_table = "ticket"
-        # `id` breaks ties so pagination is stable when timestamps collide.
         ordering = ["-created_at", "-id"]
-        indexes = [
-            # Covers the list endpoint: filter by status, newest first.
-            models.Index(fields=["status", "-created_at"]),
-        ]
 
     def __str__(self):
         return self.title
